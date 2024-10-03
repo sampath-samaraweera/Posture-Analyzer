@@ -1,29 +1,26 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image } from 'react-native';
+import {View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
-import Button from '../components/Button';
 import TextInputCustom from '../components/TextInputCustom';
+import PasswordInputCustom from '../components/PasswordInputCustom';
 import { useNavigation } from '@react-navigation/native';
 
-const Login = () => {
+const Register = () => {
     const navigation = useNavigation();
-
-    const onLogin = () => {
-        navigation.navigate('Home');
-    }
-
     const onRegister = () => {
-        navigation.navigate('Register');
+        navigation.navigate('Home');
     } 
 
     return(
         <View style={styles.container}>
-            <Image style={styles.img} source={require('../assets/images/Login.png')}/>
-            <Text style={styles.mainText}>Login</Text>
+            <Text style={styles.mainText}>Register</Text>
             <View style={styles.form}>
                 <TextInputCustom placeholder='Enter Username'/>
+                <TextInputCustom placeholder='Enter Name'/>
+                <TextInputCustom placeholder='Enter Mobile Number'/>
+                <TextInputCustom placeholder='Enter Birthday'/>
+                <PasswordInputCustom placeholder='Enter Password'/>
                 <View style={styles.buttonSet}>
-                    <Button buttonName='Login' onPress={onLogin}/>
                     <ButtonFilled buttonName='Register' onPress={onRegister}/>
                 </View>
             </View>
@@ -40,7 +37,7 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 44,
         fontFamily: 'NewsReader-Bold',
-        marginTop: 20,
+        marginTop: 60,
     },
     img:{
         width: '55%',
@@ -53,12 +50,12 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingVertical: 20,
         paddingHorizontal: 40,
+        gap: 15,
     },
     buttonSet:{
-        marginTop: 25,
+        marginTop: 20,
         marginHorizontal: 90,
-        gap: 10,
     },
 });
 
-export default Login;
+export default Register;

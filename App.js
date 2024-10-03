@@ -2,8 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Login from './src/screens/Login';
 import {useFonts} from 'expo-font';
+import Login from './src/screens/Login';
+import Register from './src/screens/Register';
+import Home from './src/screens/Home';
 
 // Prevent the splash screen from auto-hiding
 const Stack = createNativeStackNavigator();
@@ -25,6 +27,8 @@ export default function App() {
           initialRouteName="Login" 
           screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login}/>
+          <Stack.Screen name="Register" component={Register}/>
+          <Stack.Screen name="Home" component={Home}/>
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="auto" />
