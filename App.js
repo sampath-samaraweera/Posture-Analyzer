@@ -1,20 +1,40 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import Login from './src/screens/Login';
+import {useFonts} from 'expo-font';
+
+// Prevent the splash screen from auto-hiding
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [loaded] = useFonts({
+    'NewsReader': require('./src/assets/fonts/NewsReader-Regular.ttf'),
+    'NewsReader-Bold': require('./src/assets/fonts/Newsreader_36pt-Bold.ttf'),
+  });
+
+  if (!loaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName="Login" 
+          screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login}/>
+        </Stack.Navigator>
+      </NavigationContainer>
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 20,
   },
 });
