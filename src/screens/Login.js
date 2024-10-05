@@ -9,7 +9,7 @@ const Login = () => {
     const navigation = useNavigation();
 
     const onLogin = () => {
-        navigation.navigate('Home');
+        navigation.navigate('TabStack');
     }
 
     const onRegister = () => {

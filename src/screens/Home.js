@@ -1,8 +1,5 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image } from 'react-native';
-import ButtonFilled from '../components/ButtonFilled';
-import Button from '../components/Button';
-import TextInputCustom from '../components/TextInputCustom';
 import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
