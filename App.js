@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Login from './src/screens/Login';
 import Register from './src/screens/Register';
 import Home from './src/screens/Home';
+import Account from './src/screens/Account';
 import History from './src/screens/History';
 
 // Prevent the splash screen from auto-hiding
@@ -33,6 +34,8 @@ const TabStack = () => {
 
           if(route.name === 'Home'){
             iconName='home', iconSize=25;
+          }else if(route.name === 'Account'){
+            iconName='account', iconSize=25;
           }else if(route.name === 'History'){
             iconName='history', iconSize=25;
           }
@@ -49,6 +52,7 @@ const TabStack = () => {
       })}
     >
       <Tab.Screen name='Home' component={Home}/>
+      <Tab.Screen name='Account' component={Account}/>
       <Tab.Screen name='History' component={History}/>
     </Tab.Navigator>    
   )

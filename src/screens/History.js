@@ -1,62 +1,88 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {View, Text, StyleSheet, Image, Dimensions, ScrollView} from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
-import Button from '../components/Button';
 import TextInputCustom from '../components/TextInputCustom';
 import { useNavigation } from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button from '../components/Button';
+import axios from 'axios';
+import Chart from '../components/Chart';
+import RNFS from 'react-native-fs';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 const marginHorizontal = 20;
 
 const History = () => {
-    const navigation = useNavigation();
 
-    return(
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>History </Text>
+    const [data, setData] = useState();
+
+    const saveData = async () => {
+        // Set default values if inputs are empty
+        const dataToSave = {
+          neckTopX1Min: neckTopX1Min || 150,
+          neckTopY1Min: neckTopY1Min || 150,
+          flex1Min: flex1Min || 500,
+          flex2Min: flex2Min || 2400,
+        };
+        await AsyncStorage.setItem('formValues', JSON.stringify(dataToSave));
+        alert('Data saved successfully!');
+    };
+
+    const fetchHistory = async () => {
+        try {
+            const response = await axios.get('https://api.thingspeak.com/channels/2710359/feeds.json?api_key=UG3S9MQSVZ6LEKZP&results=5');
+            console.log("Hello ", response.data.feeds);
+            setData(response?.data.feeds);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return [];
+        }
+    };
+
+    const saveToFile = async (csvData) => {
+        const filePath = `${RNFS.DownloadDirectoryPath}/sensor_summary.csv`;
+      
+        try {
+          if (Platform.OS === 'android') {
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+            );
+            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+              console.error('Permission denied');
+              return;
+            }
+          }
+          await RNFS.writeFile(filePath, csvData, 'utf8');
+          console.log('File saved at:', filePath);
+        } catch (error) {
+          console.error('Error saving file:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchHistory();
+    },[])
+
+    return(     
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>History</Text>
+                </View>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {data ? ( 
+                        <>
+                            <Chart data={data} values={data?.map((item) => parseFloat(item.field1))}/>
+                            <Chart data={data} values={data?.map((item) => parseFloat(item.field2))}/> 
+                            <Chart data={data} values={data?.map((item) => parseFloat(item.field7))}/> 
+                            <Chart data={data} values={data?.map((item) => parseFloat(item.field8))}/> 
+                        </>
+                    ):(null)}
+                    <View style={styles.buttonSet}>
+                        <ButtonFilled buttonName="Download" onPress={saveData} />
+                    </View>
+                </ScrollView>
             </View>
-            <LineChart
-                data={{
-                    labels: ["January", "February", "March", "April", "May", "June"],
-                    datasets: [
-                        {
-                            data:[
-                                Math.random() * 100,
-                                Math.random() * 100,
-                                Math.random() * 100,
-                                Math.random() * 100,
-                                Math.random() * 100,
-                                Math.random() * 100
-                            ]
-                        }
-                    ]
-                }}
-                width={screenWidth - 2 * marginHorizontal}
-                height={220}
-                yAxisLabel="$"
-                yAxisSuffix="k"
-                yAxisInterval={1}
-                chartConfig={{
-                    backgroundColor: "#e26a00",
-                    backgroundGradientFrom: "#001F3B",
-                    backgroundGradientTo: "#0191BE",
-                    decimalPlaces: 1,
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    style: {
-                        padding: 10
-                    },
-                    propsForDots: {
-                    r: "6",
-                    strokeWidth: "2",
-                    stroke: "#001F3B"
-                    }
-                }}
-                style={styles.chart}
-            />
-        </View>
     )
 }
 const styles = StyleSheet.create({
@@ -75,21 +101,33 @@ const styles = StyleSheet.create({
         fontFamily: 'NewsReader-Bold',
         color: '#ffffff'
     },
-    chart:{
-        marginTop: 20,
-        borderRadius: 16,
-    },
-    angle:{
-        color: '#0191BE',
-        fontSize: 24,
+    mainText:{
+        color: '#ffffff',
+        fontSize: 44,
         fontFamily: 'NewsReader-Bold',
-        marginTop: 20,
+        marginTop: 60,
     },
-    poseText:{
-        color: '#2D852D',
-        fontSize: 24,
-        fontFamily: 'NewsReader-Bold',
+    img:{
+        width: '55%',
+        height: '29%',
+        marginTop: '18%',
+        alignItems: 'center',
+    },
+    form:{
         marginTop: 20,
+        width: '100%',
+        paddingVertical: 20,
+        paddingHorizontal: 40,
+        gap: 15,
+    },
+    buttonSet:{
+        justifyContent: 'flex-end',
+        display: 'flex',
+        marginTop: 20,
+        marginBottom: 20,
+        marginHorizontal: 40,
+        flexDirection: 'column',
+        gap: 8,
     },
 });
 
