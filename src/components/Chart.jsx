@@ -1,7 +1,7 @@
 import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
+import { Dimensions, View, Text } from 'react-native';
 
-const Chart = ({ data, values }) => {
+const Chart = ({ data, values, title }) => {
   const screenWidth = Dimensions.get('window').width;
 
   const chartData = {
@@ -14,18 +14,23 @@ const Chart = ({ data, values }) => {
   };
 
   return (
+    <View>
+    <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10, marginBottom: 5 }}>
+      {title}
+    </Text>
     <LineChart
       data={chartData}
       width={screenWidth}
       height={220}
       chartConfig={{
         backgroundColor: '#e26a00',
-        backgroundGradientFrom: '#fb8c00',
-        backgroundGradientTo: '#ffa726',
+        backgroundGradientFrom: '#001F3B',
+        backgroundGradientTo: '#0191BE',
         decimalPlaces: 2,
         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       }}
     />
+    </View>
   );
 };
 

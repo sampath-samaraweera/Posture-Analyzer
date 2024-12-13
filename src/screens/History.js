@@ -1,63 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, StyleSheet, Image, Dimensions, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, ScrollView} from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
-import TextInputCustom from '../components/TextInputCustom';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../components/Button';
 import axios from 'axios';
 import Chart from '../components/Chart';
-import RNFS from 'react-native-fs';
-import { PermissionsAndroid, Platform } from 'react-native';
-
-const screenWidth = Dimensions.get('window').width;
-const marginHorizontal = 20;
+import * as FileSystem from 'expo-file-system';
 
 const History = () => {
 
-    const [data, setData] = useState();
+    const [data, setData] = useState();  
+    const [loading, setLoading] = useState(false);
 
-    const saveData = async () => {
-        // Set default values if inputs are empty
-        const dataToSave = {
-          neckTopX1Min: neckTopX1Min || 150,
-          neckTopY1Min: neckTopY1Min || 150,
-          flex1Min: flex1Min || 500,
-          flex2Min: flex2Min || 2400,
-        };
-        await AsyncStorage.setItem('formValues', JSON.stringify(dataToSave));
-        alert('Data saved successfully!');
-    };
 
     const fetchHistory = async () => {
         try {
+            setLoading(true);
             const response = await axios.get('https://api.thingspeak.com/channels/2710359/feeds.json?api_key=UG3S9MQSVZ6LEKZP&results=5');
             console.log("Hello ", response.data.feeds);
             setData(response?.data.feeds);
         } catch (error) {
             console.error('Error fetching data:', error);
             return [];
+        }finally{
+            setLoading(false);
         }
     };
 
-    const saveToFile = async (csvData) => {
-        const filePath = `${RNFS.DownloadDirectoryPath}/sensor_summary.csv`;
-      
+    const saveFile = async (csvData) => {
         try {
-          if (Platform.OS === 'android') {
-            const granted = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-            );
-            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-              console.error('Permission denied');
-              return;
-            }
-          }
-          await RNFS.writeFile(filePath, csvData, 'utf8');
-          console.log('File saved at:', filePath);
+          setLoading(true);
+          const fileUri = FileSystem.documentDirectory + 'Posture_Analyzer_History.csv';
+          await FileSystem.writeAsStringAsync(fileUri, csvData, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
+          alert('File saved successfully');
+    
         } catch (error) {
-          console.error('Error saving file:', error);
+            alert('Error saving or sharing file.');
+          console.error('Error saving or sharing file:', error);
+        }finally{
+          setLoading(false);
         }
+      };
+
+    const convertToCSV = (data) => {
+        const header = 'Time,NeckTopX1,NeckTopY1,Flex1,Flex2\n';
+        if (data){
+            const rows = data
+            .map((item) => `${item.created_at},${item.field1},${item.field2},${item.field7},${item.field8}`)
+            .join('\n');
+            return header + rows;
+        }
+        return header;
+      }
+
+    const handleDownload = async (data) => {
+        const csvData = convertToCSV(data);
+        await saveFile(csvData);
     };
 
     useEffect(() => {
@@ -69,19 +67,24 @@ const History = () => {
                 <View style={styles.header}>
                     <Text style={styles.headerText}>History</Text>
                 </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {data ? ( 
-                        <>
-                            <Chart data={data} values={data?.map((item) => parseFloat(item.field1))}/>
-                            <Chart data={data} values={data?.map((item) => parseFloat(item.field2))}/> 
-                            <Chart data={data} values={data?.map((item) => parseFloat(item.field7))}/> 
-                            <Chart data={data} values={data?.map((item) => parseFloat(item.field8))}/> 
-                        </>
-                    ):(null)}
-                    <View style={styles.buttonSet}>
-                        <ButtonFilled buttonName="Download" onPress={saveData} />
-                    </View>
-                </ScrollView>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#001F3B" style={{display:'flex', flex: 1,}} />
+                ) : (
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {data ? ( 
+                            <>
+                                <Chart data={data} title="NeckTop X1" values={data?.map((item) => parseFloat(item.field1))}/>
+                                <Chart data={data} title="NeckTop Y1" values={data?.map((item) => parseFloat(item.field2))}/> 
+                                <Chart data={data} title="Flex 1" values={data?.map((item) => parseFloat(item.field7))}/> 
+                                <Chart data={data} title="Flex 2" values={data?.map((item) => parseFloat(item.field8))}/> 
+                            
+                                <View style={styles.buttonSet}>
+                                    <ButtonFilled buttonName="Download History" onPress={() => handleDownload(data)} iconName="download"/>
+                                </View>
+                            </>
+                        ):(null)}
+                    </ScrollView>
+                )}
             </View>
     )
 }
