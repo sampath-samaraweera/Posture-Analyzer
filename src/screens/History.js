@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, StyleSheet, ActivityIndicator, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, ScrollView, Platform, Alert} from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
 import axios from 'axios';
 import Chart from '../components/Chart';
 import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import { shareAsync } from 'expo-sharing';
 
 const History = () => {
 
@@ -25,22 +27,69 @@ const History = () => {
         }
     };
 
+  
+
     const saveFile = async (csvData) => {
         try {
-          setLoading(true);
-          const fileUri = FileSystem.documentDirectory + 'Posture_Analyzer_History.csv';
-          await FileSystem.writeAsStringAsync(fileUri, csvData, {
-            encoding: FileSystem.EncodingType.UTF8,
-          });
-          alert('File saved successfully');
+            // Define file name and path
+            const fileName = 'Posture_Analyzer_History.csv';
+            const fileUri = FileSystem.cacheDirectory + fileName;
     
+            console.log("File URI:", fileUri);
+    
+            // Write CSV data to a file
+            await FileSystem.writeAsStringAsync(fileUri, csvData, {
+                encoding: FileSystem.EncodingType.UTF8,
+            });
+    
+            const fileExists = await FileSystem.getInfoAsync(fileUri);
+            console.log("File exists:", fileExists.exists);
+    
+            if (!fileExists.exists) {
+                throw new Error("File not created successfully.");
+            }
+    
+            // For Android, handle permissions and file saving
+            if (Platform.OS === 'android') {
+                // Request storage access permission (use StorageAccessFramework for Android)
+                const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    
+                if (permissions.granted) {
+                    // Convert file data to base64
+                    const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+    
+                    // Create and save the file to the selected directory
+                    await FileSystem.StorageAccessFramework.createFileAsync(
+                        permissions.directoryUri,
+                        fileName,
+                        'text/csv'
+                    ).then(async (newFileUri) => {
+                        // Write the base64 data to the file
+                        await FileSystem.writeAsStringAsync(newFileUri, base64Data, {
+                            encoding: FileSystem.EncodingType.Base64,
+                        });
+                        Alert.alert('Success', 'File saved successfully.');
+                    });
+                } else {
+                    // If permissions are not granted, fall back to shareAsync
+                    await shareAsync(fileUri, { mimeType: 'text/csv' });
+                    Alert.alert('Success', 'File shared successfully.');
+                }
+            } else {
+                // For iOS or other platforms, directly share the file
+                shareAsync(fileUri, { mimeType: 'text/csv' });
+                Alert.alert('Success');
+            }
         } catch (error) {
-            alert('Error saving or sharing file.');
-          console.error('Error saving or sharing file:', error);
-        }finally{
-          setLoading(false);
+            console.error('Error saving file:', error);
+            Alert.alert('Error', 'Failed to save file. Please try again.');
+        } finally {
+            setLoading(false);
         }
-      };
+    };
+    
 
     const convertToCSV = (data) => {
         const header = 'Time,NeckTopX1,NeckTopY1,Flex1,Flex2\n';
@@ -54,6 +103,7 @@ const History = () => {
       }
 
     const handleDownload = async (data) => {
+        console.log("data");
         const csvData = convertToCSV(data);
         await saveFile(csvData);
     };
@@ -68,7 +118,7 @@ const History = () => {
                     <Text style={styles.headerText}>History</Text>
                 </View>
                 {loading ? (
-                    <ActivityIndicator size="large" color="#001F3B" style={{display:'flex', flex: 1,}} />
+                    <ActivityIndicator size={30} color="#001F3B" style={{display:'flex', flex: 1,}} />
                 ) : (
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {data ? ( 

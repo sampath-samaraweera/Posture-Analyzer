@@ -4,12 +4,6 @@ import ButtonFilled from '../components/ButtonFilled';
 import TextInputCustom from '../components/TextInputCustom';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../components/Button';
-import axios from 'axios';
-import Chart from '../components/Chart';
-
-const screenWidth = Dimensions.get('window').width;
-const marginHorizontal = 20;
 
 const Account = () => {
     const navigation = useNavigation();
@@ -34,10 +28,10 @@ const Account = () => {
     };
 
     const clearData = () => {
-        setNeckTopX1Min();
-        setNeckTopY1Min();
-        setFlex1Min();
-        setFlex2Min();
+        setNeckTopX1Min('');
+        setNeckTopY1Min('');
+        setFlex1Min('');
+        setFlex2Min('');
     };
 
     const clearStoredData = () => {
@@ -56,30 +50,30 @@ const Account = () => {
                         <TextInputCustom 
                             placeholder='Neck Top X1'
                             type="text" caption="Neck Top X1"
-                            value={flex1Min}
+                            value={neckTopX1Min}
                             keyboardType="numeric"
-                            onChange={(e) => setNeckTopX1Min(e.target.value)} 
+                            onChangeText={setNeckTopX1Min} 
                         />
                         <TextInputCustom 
                             placeholder='Neck Top Y1'
                             type="text" caption="Neck Top Y1"
-                            value={flex1Min}
+                            value={neckTopY1Min}
                             keyboardType="numeric"
-                            onChange={(e) => setNeckTopY1Min(e.target.value)} 
+                            onChangeText={setNeckTopY1Min} 
                         />
                         <TextInputCustom 
                             placeholder='Flex 1 Min'
                             type="text" caption="Flex 1 Min"
                             value={flex1Min}
                             keyboardType="numeric"
-                            onChange={(e) => setFlex1Min(e.target.value)} 
+                            onChangeText={setFlex1Min} 
                         />
                         <TextInputCustom 
                             placeholder='Flex 1 Max'
                             type="text" caption="Flex 2 Min"
                             value={flex2Min}
                             keyboardType="numeric"
-                            onChange={(e) => setFlex2Min(e.target.value)} 
+                            onChangeText={setFlex2Min} 
                         />
                         <View style={styles.buttonSet}>
                             <ButtonFilled buttonName="Save" onPress={saveData} />

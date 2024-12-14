@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {View, Text, StyleSheet, Image } from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
 import Button from '../components/Button';
@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
     const navigation = useNavigation();
+
+    const [userName, setUserName] = useState();
 
     const onLogin = () => {
         navigation.navigate('TabStack');
@@ -21,7 +23,12 @@ const Login = () => {
             <Image style={styles.img} source={require('../assets/images/Login.png')}/>
             <Text style={styles.mainText}>Login</Text>
             <View style={styles.form}>
-                <TextInputCustom placeholder='Enter Username'/>
+                <TextInputCustom 
+                    placeholder='Enter Username'
+                    type="text" caption="Enter Username"
+                    value={userName}
+                    onChangeText={setUserName} 
+                />
                 <View style={styles.buttonSet}>
                     <Button buttonName='Login' onPress={onLogin}/>
                     <ButtonFilled buttonName='Register' onPress={onRegister}/>
@@ -43,8 +50,8 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     img:{
-        width: '55%',
-        height: '29%',
+        width: 200,
+        height: 200,
         marginTop: '18%',
         alignItems: 'center',
     },

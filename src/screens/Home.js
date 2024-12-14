@@ -59,57 +59,57 @@ const Home = () => {
         }
     };
 
-    TaskManager.defineTask('BACKGROUND_FETCH', async () => {
-        try {
-            // Fetch data and store locally
-            const response = await axios.get(THINGSPEAK_API_URL);
-            const neckTopX1 = response.data.feeds[0].field1;
-            const neckTopY1 = response.data.feeds[0].field2;
-            const neckMiddle = response.data.feeds[0].field3;
-            const flex1 = response.data.feeds[0].field7;
-            const flex2 = response.data.feeds[0].field8;
+    // TaskManager.defineTask('BACKGROUND_FETCH', async () => {
+    //     try {
+    //         // Fetch data and store locally
+    //         const response = await axios.get(THINGSPEAK_API_URL);
+    //         const neckTopX1 = response.data.feeds[0].field1;
+    //         const neckTopY1 = response.data.feeds[0].field2;
+    //         const neckMiddle = response.data.feeds[0].field3;
+    //         const flex1 = response.data.feeds[0].field7;
+    //         const flex2 = response.data.feeds[0].field8;
             
-            console.log("NeckTop X1:", neckTopX1);
-            console.log("NeckTop Y1:", neckTopY1);
-            console.log("NeckMiddle:", neckMiddle);
-            console.log("Fetched Flex1:", flex1);
-            console.log("Fetched Flex2:", flex2);
+    //         console.log("NeckTop X1:", neckTopX1);
+    //         console.log("NeckTop Y1:", neckTopY1);
+    //         console.log("NeckMiddle:", neckMiddle);
+    //         console.log("Fetched Flex1:", flex1);
+    //         console.log("Fetched Flex2:", flex2);
     
-            // Check if conditions meet the threshold
+    //         // Check if conditions meet the threshold
             
-            if (!(neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
-                (flex1 < flex1Min) && 
-                (flex2 < flex2Min)) && !notificationSent) {
-                await showNotification();
-                notificationSent = true;
-            } else if (!(neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
-                (flex1 < flex1Min) && 
-                (flex2 < flex2Min))) {
-                notificationSent = false; 
-            }
+    //         if (!(neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
+    //             (flex1 < flex1Min) && 
+    //             (flex2 < flex2Min)) && !notificationSent) {
+    //             await showNotification();
+    //             notificationSent = true;
+    //         } else if (!(neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
+    //             (flex1 < flex1Min) && 
+    //             (flex2 < flex2Min))) {
+    //             notificationSent = false; 
+    //         }
     
-            return BackgroundFetch.Result.NewData;
-        } catch (error) {
-            console.log('Error in Background Fetch:', error);
-            return BackgroundFetch.Result.Failed;
-        }
-    });
+    //         return BackgroundFetch.Result.NewData;
+    //     } catch (error) {
+    //         console.log('Error in Background Fetch:', error);
+    //         return BackgroundFetch.Result.Failed;
+    //     }
+    // });
 
-      const registerBackgroundFetch = async () => {
-        try {
-          const status = await BackgroundFetch.getStatusAsync();
-          console.log("Background Fetch Status:", status);
+    //   const registerBackgroundFetch = async () => {
+    //     try {
+    //       const status = await BackgroundFetch.getStatusAsync();
+    //       console.log("Background Fetch Status:", status);
           
-          await BackgroundFetch.registerTaskAsync('BACKGROUND_FETCH', {
-            minimumInterval: 15,
-            stopOnTerminate: false,
-            startOnBoot: true,
-          });
-          console.log("Background fetch registered successfully.");
-        } catch (error) {
-          console.error("Failed to register background fetch:", error);
-        }
-    };
+    //       await BackgroundFetch.registerTaskAsync('BACKGROUND_FETCH', {
+    //         minimumInterval: 15,
+    //         stopOnTerminate: false,
+    //         startOnBoot: true,
+    //       });
+    //       console.log("Background fetch registered successfully.");
+    //     } catch (error) {
+    //       console.error("Failed to register background fetch:", error);
+    //     }
+    // };
     
 
     const showNotification = async () => {
@@ -143,9 +143,9 @@ const Home = () => {
         };
         loadData();
 
-        requestNotificationPermissions();
+        // requestNotificationPermissions();
         fetchData();
-        registerBackgroundFetch();
+        // registerBackgroundFetch();
         
         // Set up interval for repeated API calls
         const intervalId = setInterval(fetchData, 12000); // fetch every 5 seconds
