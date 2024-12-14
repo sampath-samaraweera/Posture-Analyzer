@@ -92,7 +92,7 @@ const History = () => {
     
 
     const convertToCSV = (data) => {
-        const header = 'Time,NeckTopX1,NeckTopY1,Flex1,Flex2\n';
+        const header = 'Time,Neck,Lower Lumbar,External Oblique Left,External Oblique Right\n';
         if (data){
             const rows = data
             .map((item) => `${item.created_at},${item.field1},${item.field2},${item.field7},${item.field8}`)
@@ -103,7 +103,7 @@ const History = () => {
       }
 
     const handleDownload = async (data) => {
-        console.log("data");
+        console.log("data", data);
         const csvData = convertToCSV(data);
         await saveFile(csvData);
     };

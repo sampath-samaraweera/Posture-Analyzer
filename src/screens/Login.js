@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Image } from 'react-native';
+import {View, Text, StyleSheet, Image, Alert } from 'react-native';
 import ButtonFilled from '../components/ButtonFilled';
 import Button from '../components/Button';
 import TextInputCustom from '../components/TextInputCustom';
@@ -11,7 +11,19 @@ const Login = () => {
     const [userName, setUserName] = useState();
 
     const onLogin = () => {
-        navigation.navigate('TabStack');
+        if (!userName){
+            Alert.alert('Error', 'Please enter username')
+        }
+        else{
+            if(userName == "abc"){
+                navigation.navigate('TabStack');            
+                Alert.alert('Success', 'Successfully logged in')
+            }
+            else{
+                Alert.alert('Error', 'Invalid username')
+            }            
+        }
+
     }
 
     const onRegister = () => {

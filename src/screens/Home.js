@@ -124,6 +124,7 @@ const Home = () => {
         });
     };
       
+    //local storage
     useEffect(() => {
         // Load saved data from local storage on component mount
         const loadData = async () => {
@@ -148,12 +149,11 @@ const Home = () => {
         // registerBackgroundFetch();
         
         // Set up interval for repeated API calls
-        const intervalId = setInterval(fetchData, 12000); // fetch every 5 seconds
+        const intervalId = setInterval(fetchData, 1000); // fetch every 5 seconds
 
         // Clean up interval on component unmount
         return () => clearInterval(intervalId);
       }, []);
-
 
     useEffect(() => {
         // Check posture conditions and trigger alert if necessary
