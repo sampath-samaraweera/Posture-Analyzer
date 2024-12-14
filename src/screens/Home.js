@@ -163,7 +163,7 @@ const Home = () => {
         console.log("flex 1",flex1)
         console.log("flex 2",flex2)
         if (neckTopX1 && neckTopY1 && flex1 && flex2 ){
-            if (neckTopX1 != 0 || neckTopY1 != 0 || flex1 != 0 || flex2 != 0) {
+            if (neckTopX1 != 0 && neckTopY1 != 0 && flex1 != 0 && flex2 != 0) {
                 if (!(neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
                     (flex1 < flex1Min) && 
                     (flex2 < flex2Min))) {
@@ -197,13 +197,13 @@ const Home = () => {
                 <Text style={styles.headerText}>Posture Analyzer</Text>
             </View>
             <View style={styles.imgContainer}>
-                {neckTopX1 && neckTopY1 && flex1 && flex2? (              
+                {neckTopX1 && neckTopY1  && flex1 !=0 && flex2 !=0 ? (              
                     (neckTopX1 > neckTopX1Min && neckTopY1 > neckTopY1Min && 
                     (flex1 < flex1Min) && 
                     (flex2 < flex2Min)) ? (
                         <>
                             <Image style={styles.img} source={require('../assets/images/poses/Correct.jpg')}/>
-                            <Text style={styles.poseText}>You are in the right Posture </Text>
+                            <Text style={styles.poseText}>You are in the right Posture {flex1}{flex2}</Text>
                         </>
                     ):(
                         flex1 > flex1Min || flex2 > flex2Min ? (
